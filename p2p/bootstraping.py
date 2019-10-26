@@ -5,9 +5,8 @@ from twisted.internet import reactor
 from uuid import uuid4
 from time import time
 from twisted.internet.task import LoopingCall
+from p2p.p2p_config import *
 
-BOOTSTRAP_IP = "172.20.10.4"
-BOOTSTRAP_PORT = 5999
 genom = "123"
 status = True
 generate_nodeid = lambda: str(uuid4())

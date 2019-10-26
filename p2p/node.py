@@ -6,12 +6,8 @@ from twisted.internet.protocol import Protocol, Factory,ClientCreator
 from twisted.internet import reactor
 from uuid import uuid4
 from time import time
+from p2p.p2p_config import *
 from twisted.internet.task import LoopingCall
-
-BOOTSTRAP_IP = "172.20.10.4"
-BOOTSTRAP_PORT = 5999
-NODE_PORT_API = 7000
-HOST_IP = "172.20.10.4"
 
 def pi():
     """
@@ -231,7 +227,7 @@ class ClientProtocol(Protocol):
             if list(peer.keys())[0] == HOST_IP:
                 continue
             c = ClientCreator(reactor, ClientProtocol)
-            c.connectTCP(list(peer.keys())[0], 6000).addCallback(gotPeerTask,data=data)
+            c.connectTCP(list(peer.keys())[0], NODE_PORT_SERVER).addCallback(gotPeerTask,data=data)
 
     def handle_hello(self, hello):
         hello = json.loads(hello)
@@ -268,10 +264,10 @@ class APIFactory(Factory):
         return APIProtocol(self)
 
 print('Node run ...')
-endpoint = TCP4ServerEndpoint(reactor, 6000, interface="172.20.10.4")
+endpoint = TCP4ServerEndpoint(reactor, NODE_PORT_SERVER, interface=HOST_IP)
 endpoint.listen(MyFactory())
 
-endpoint_2 = TCP4ServerEndpoint(reactor, 7000, interface="172.20.10.4")
+endpoint_2 = TCP4ServerEndpoint(reactor, NODE_PORT_API, interface=HOST_IP)
 endpoint_2.listen(APIFactory())
 
 c = ClientCreator(reactor, ClientProtocol)
