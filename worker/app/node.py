@@ -6,12 +6,13 @@ from twisted.internet.protocol import Protocol, Factory,ClientCreator
 from twisted.internet import reactor
 from uuid import uuid4
 from time import time
+import config as cfg
 from twisted.internet.task import LoopingCall
 
-BOOTSTRAP_IP = "172.20.10.4"
-BOOTSTRAP_PORT = 5999
-NODE_PORT_API = 7000
-HOST_IP = "172.20.10.2"
+BOOTSTRAP_IP = cfg.controller_host
+BOOTSTRAP_PORT = cfg.controller_port
+NODE_PORT_API = cfg.port
+HOST_IP = cfg.host
 
 def pi():
     """
@@ -267,13 +268,14 @@ class APIFactory(Factory):
     def buildProtocol(self, addr):
         return APIProtocol(self)
 
-print('Node run ...')
-endpoint = TCP4ServerEndpoint(reactor, 6000, interface="172.20.10.2")
-endpoint.listen(MyFactory())
+def node_run():
+    print('Node run ...')
+    endpoint = TCP4ServerEndpoint(reactor, 6000, interface=cfg.host)
+    endpoint.listen(MyFactory())
 
-endpoint_2 = TCP4ServerEndpoint(reactor, 7000, interface="172.20.10.2")
-endpoint_2.listen(APIFactory())
+    endpoint_2 = TCP4ServerEndpoint(reactor, 7000, interface=cfg.host)
+    endpoint_2.listen(APIFactory())
 
-c = ClientCreator(reactor, ClientProtocol)
-c.connectTCP(BOOTSTRAP_IP, BOOTSTRAP_PORT).addCallback(gotProtocol)
-reactor.run()
+    c = ClientCreator(reactor, ClientProtocol)
+    c.connectTCP(BOOTSTRAP_IP, BOOTSTRAP_PORT).addCallback(gotProtocol)
+    reactor.run()
