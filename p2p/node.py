@@ -6,7 +6,7 @@ from uuid import uuid4
 from time import time
 from twisted.internet.task import LoopingCall
 
-BOOTSTRAP_IP = "127.0.0.1"
+BOOTSTRAP_IP = "172.20.10.4"
 BOOTSTRAP_PORT = 5999
 
 genom = "asdasdasdas"
@@ -46,10 +46,6 @@ class ServerProtocol(Protocol):
             msgtype = json.loads(line)['msgtype']
             if msgtype == "hello":
                 self.handle_hello(line)
-            elif msgtype == "ping":
-                self.handle_ping()
-            elif msgtype == "pong":
-                self.handle_pong()
             elif msgtype == "get_list_request":
                 self.handle_get_list_request()
             elif msgtype == "get_list_response":
@@ -62,15 +58,6 @@ class ServerProtocol(Protocol):
     def send_hello(self):
         hello = json.dumps({'nodeid': self.nodeid, 'msgtype': 'hello'}).encode('utf-8')
         self.transport.write(hello + b"\n")
-
-    def send_ping(self):
-        ping = json.dumps({'msgtype': 'ping'}).encode('utf-8')
-        print("Pinging", self.remote_nodeid)
-        self.transport.write(ping + b"\n")
-
-    def send_pong(self):
-        pong = json.dumps({'msgtype': 'pong'}).encode('utf-8')
-        self.transport.write(pong + b"\n")
 
     def send_get_list_request(self):
         pong = json.dumps({'msgtype': 'get_list'}).encode('utf-8')
@@ -88,14 +75,6 @@ class ServerProtocol(Protocol):
         print("Send task response status", status)
         pong = json.dumps({'msgtype': 'send_task_response','status':status}).encode('utf-8')
         self.transport.write(pong + b"\n")
-
-    def handle_ping(self):
-        self.send_pong()
-
-    def handle_pong(self):
-        print("Got pong from", self.remote_nodeid)
-        ###Update the timestamp
-        self.lastping = time()
 
     def handle_get_list_request(self):
         print("Got get_list request", self.remote_nodeid)
@@ -199,8 +178,7 @@ class MyProtocol(Protocol):
             if list(peer.keys())[0] == self.nodeid:
                 continue
             c = ClientCreator(reactor, MyProtocol)
-            c.connectTCP(list(peer.values())[0][0], list(peer.values())[0][1]).addCallback(gotPeerTask)
-            reactor.run()
+            c.connectTCP(list(peer.values())[0][0], 6000).addCallback(gotPeerTask)
 
     def handle_hello(self, hello):
         hello = json.loads(hello)
@@ -230,5 +208,5 @@ print('Node run ...')
 endpoint = TCP4ServerEndpoint(reactor, 6000, interface="172.20.10.4")
 endpoint.listen(MyFactory())
 c = ClientCreator(reactor, MyProtocol)
-c.connectTCP(BOOTSTRAP_IP, BOOTSTRAP_PORT, bindAddress="172.20.10.4").addCallback(gotProtocol)
+c.connectTCP(BOOTSTRAP_IP, BOOTSTRAP_PORT).addCallback(gotProtocol)
 reactor.run()

@@ -6,7 +6,7 @@ from uuid import uuid4
 from time import time
 from twisted.internet.task import LoopingCall
 
-BOOTSTRAP_IP = "127.0.0.1"
+BOOTSTRAP_IP = "172.20.10.4"
 BOOTSTRAP_PORT = 5999
 genom = "123"
 status = True
@@ -121,6 +121,6 @@ class MyFactory(Factory):
         return MyProtocol(self)
 
 print('Bootstraping Node run ...')
-endpoint = TCP4ServerEndpoint(reactor, BOOTSTRAP_PORT)
+endpoint = TCP4ServerEndpoint(reactor, BOOTSTRAP_PORT, interface="172.20.10.4")
 endpoint.listen(MyFactory())
 reactor.run()
