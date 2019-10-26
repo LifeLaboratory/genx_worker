@@ -11,7 +11,7 @@ from twisted.internet.task import LoopingCall
 BOOTSTRAP_IP = "172.20.10.4"
 BOOTSTRAP_PORT = 5999
 NODE_PORT_API = 7000
-HOST_IP = "172.20.10.4"
+HOST_IP = "172.20.10.2"
 
 def pi():
     """
@@ -102,7 +102,7 @@ class ServerProtocol(Protocol):
             elif msgtype == "get_list_response":
                 self.handle_get_list_response(json.loads(line)['peers'])
             elif msgtype == "send_task_request":
-                self.handle_task_request(json.loads(line)['task'], json.loads(line)['data'])
+                self.handle_task_request(json.loads(line)['data'])
             elif msgtype == "send_task_response":
                 self.handle_task_response(json.loads(line)['status'])
 
@@ -124,7 +124,7 @@ class ServerProtocol(Protocol):
 
     def send_task_response(self,data):
         print("Send task response status", status)
-        r.post(data["node_ip"]+"/task/result", data=json.dumps({"task_id":data["task_id"], "status": status}))
+        r.post('http://' + data["node_ip"]+"/task/result", data=json.dumps({"task_id":data["task_id"], "status": status}))
 
     def handle_get_list_request(self):
         print("Got get_list request", self.remote_nodeid)
@@ -145,8 +145,8 @@ class ServerProtocol(Protocol):
             self.factory.peers[self.remote_nodeid] = (self.remote_ip.host,self.remote_ip.port)
             self.lc_ping.start(60)
 
-    def handle_task_request(self, task, data):
-        print("Task request", task, data)
+    def handle_task_request(self, data):
+        print("Task request", data)
         pin = pi()
         self.send_task_response(data)
 
@@ -268,10 +268,10 @@ class APIFactory(Factory):
         return APIProtocol(self)
 
 print('Node run ...')
-endpoint = TCP4ServerEndpoint(reactor, 6000, interface="172.20.10.4")
+endpoint = TCP4ServerEndpoint(reactor, 6000, interface="172.20.10.2")
 endpoint.listen(MyFactory())
 
-endpoint_2 = TCP4ServerEndpoint(reactor, 7000, interface="172.20.10.4")
+endpoint_2 = TCP4ServerEndpoint(reactor, 7000, interface="172.20.10.2")
 endpoint_2.listen(APIFactory())
 
 c = ClientCreator(reactor, ClientProtocol)
