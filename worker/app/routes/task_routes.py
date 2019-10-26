@@ -1,4 +1,4 @@
-from flask import request,  abort, Blueprint
+from flask import request, Blueprint
 from db.task import Provider
 import json
 task = Blueprint('task', __name__)

@@ -1,5 +1,4 @@
-from flask import request,  abort, Blueprint
-from models.task_result import TaskResult
+from flask import request, Blueprint
 from db.task_result import Provider
 task_result = Blueprint('task_result', __name__)
 
