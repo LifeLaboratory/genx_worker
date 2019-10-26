@@ -102,7 +102,7 @@ class ServerProtocol(Protocol):
             elif msgtype == "get_list_response":
                 self.handle_get_list_response(json.loads(line)['peers'])
             elif msgtype == "send_task_request":
-                self.handle_task_request(json.loads(line)['task'], json.loads(line)['data'])
+                self.handle_task_request(json.loads(line)['data'])
             elif msgtype == "send_task_response":
                 self.handle_task_response(json.loads(line)['status'])
 
@@ -145,8 +145,8 @@ class ServerProtocol(Protocol):
             self.factory.peers[self.remote_nodeid] = (self.remote_ip.host,self.remote_ip.port)
             self.lc_ping.start(60)
 
-    def handle_task_request(self, task, data):
-        print("Task request", task, data)
+    def handle_task_request(self, data):
+        print("Task request", data)
         pin = pi()
         self.send_task_response(data)
 
@@ -231,7 +231,7 @@ class ClientProtocol(Protocol):
             if list(peer.keys())[0] == HOST_IP:
                 continue
             c = ClientCreator(reactor, ClientProtocol)
-            c.connectTCP(list(peer.values())[0], 6000).addCallback(gotPeerTask,data=data)
+            c.connectTCP(list(peer.keys())[0], 6000).addCallback(gotPeerTask,data=data)
 
     def handle_hello(self, hello):
         hello = json.loads(hello)
