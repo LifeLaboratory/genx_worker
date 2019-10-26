@@ -1,13 +1,9 @@
-from flask import request,  abort
-from models.task import Task
-from app import app
+from flask import request,  abort, Blueprint
 
-@app.route('/SubmitTask', methods=["POST"])
-def submit_task():
-    task = Task(request.json)
-    return "SUBMIT"
 
-@app.route('/ReceiveTask', methods=["POST"])
-def receive_task():
-    task = Task(request.json)
-    return "RECEIVE"
+cert = Blueprint('cert', __name__)
+
+@cert.route('/cert', methods=["GET"])
+def cert_request():
+    from app import worker
+    return worker.cert.json()

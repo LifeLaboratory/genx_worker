@@ -1,4 +1,5 @@
 
 class TaskResult:
-    def __init__(self, json):
-        print('task created')
+    def __init__(self, taskId, data):
+        self.taskId = taskId
+        self.data = data

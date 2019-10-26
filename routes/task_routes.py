@@ -1,7 +1,15 @@
-from flask import request,  abort
-from models.cert import Cert
-from app import app
+from flask import request,  abort, Blueprint
+from db.task import Provider
+import json
+task = Blueprint('task', __name__)
 
-@app.route('/CertRequest', methods=["GET"])
-def cert_request():
-    return "SUBMIT"
+@task.route('/task', methods=["POST"])
+def submit_task():
+    body = request.json
+    answer = Provider.create_task(body)
+    return str(answer)
+
+@task.route('/tasks', methods=["GET"])
+def get_tasks():
+    answer = Provider.get_tasks({})
+    return json.dumps(answer)
