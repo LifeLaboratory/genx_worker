@@ -46,7 +46,7 @@ class MyProtocol(Protocol):
             elif msgtype == "pong":
                 self.handle_pong()
             elif msgtype == "get_list_request":
-                self.handle_get_list_request()
+                self.handle_get_list_request(json.loads(line)['data'])
             elif msgtype == "get_list_response":
                 self.handle_get_list_response(json.loads(line)['peers'])
 
@@ -67,8 +67,8 @@ class MyProtocol(Protocol):
         pong = json.dumps({'msgtype': 'get_list'}).encode('utf-8')
         self.transport.write(pong + b"\n")
 
-    def send_get_list_response(self, peers):
-        pong = json.dumps({'msgtype': 'get_list_response', 'peers':peers}).encode('utf-8')
+    def send_get_list_response(self, peers, data):
+        pong = json.dumps({'msgtype': 'get_list_response', 'peers':[peers], 'data':data}).encode('utf-8')
         self.transport.write(pong + b"\n")
 
     def send_task_request(self):
@@ -87,10 +87,10 @@ class MyProtocol(Protocol):
         ###Update the timestamp
         self.lastping = time()
 
-    def handle_get_list_request(self):
+    def handle_get_list_request(self,data):
         print("Got get_list request", self.remote_nodeid)
         print("Peers", self.factory.peers)
-        self.send_get_list_response(self.factory.peers)
+        self.send_get_list_response(self.factory.peers, data)
 
     def handle_get_list_response(self, peers):
         print("Got get_list response", self.remote_nodeid)
@@ -103,7 +103,7 @@ class MyProtocol(Protocol):
             print("Connected to myself.")
             self.transport.loseConnection()
         else:
-            self.factory.peers[self.remote_nodeid] = (self.remote_ip.host,self.remote_ip.port)
+            self.factory.peers[self.remote_ip.host] = self.remote_ip.port
             self.lc_ping.start(60)
 
     def handle_task_request(self,status):
