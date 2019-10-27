@@ -1,0 +1,22 @@
+version: '3.3'
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: hackmoscow
+      POSTGRES_PASSWORD: hackmoscow
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./data.sql:/docker-entrypoint-initdb.d/2-data.sql
+  api:
+    build: ./worker
+    expose:
+      - 4040
+    ports:
+      - 4040:4040
+      - 7000:7000
+      - 6000:6000
+    restart: always
+    depends_on:
+      - db
