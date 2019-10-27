@@ -1,8 +1,8 @@
 import json
 import socket
 import requests as r
-
-NODE_IP = "172.20.10.4"
+import config as cfg
+NODE_IP = cfg.host
 NODE_PORT_API = 7000
 
 
