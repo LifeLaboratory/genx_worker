@@ -13,7 +13,11 @@ def submit_task():
     answer = Provider.create_task(body)
     N = int(random.random()*100)
     genom = ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
-    task = {'gemom':genom,'node_ip': config.host, 'task_id': answer['id']}
+    if isinstance(answer, list):
+        answer = answer[0]
+    if isinstance(answer, int):
+        answer = {'id':answer}
+    task = {'genom':genom,'node_ip': config.host, 'task_id': answer['id']}
     api.p2p_create_task(task)
     return json.dumps(answer)
 

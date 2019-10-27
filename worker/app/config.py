@@ -1,8 +1,8 @@
-name = "thierd"
-host = '0.0.0.0'
-port = 1234
+name = "First"
+host = '172.20.10.2'
+port = 4040
 controller_host = '172.20.10.2'
-controller_port = 2312
+controller_port = 1010
 
 
 DATABASE = {

@@ -6,7 +6,8 @@ class Provider:
     @staticmethod
     def get_tasks(args):
         query = """
-            SELECT * FROM Tasks
+            SELECT * FROM TaskResult
+            join Tasks t on t.id = TaskResult.taskid
                 """
         return Sql.exec(query=query, args=args)
 

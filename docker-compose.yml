@@ -12,9 +12,9 @@ services:
   api:
     build: ./worker
     expose:
-      - 2021
+      - 4040
     ports:
-      - 2021:2021
+      - 4040:4040
       - 7000:7000
       - 6000:6000
     restart: always
