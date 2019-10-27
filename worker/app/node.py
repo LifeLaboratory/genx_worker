@@ -194,8 +194,8 @@ class ClientProtocol(Protocol):
         print("Pinging", self.remote_nodeid)
         self.transport.write(ping + b"\n")
 
-    def send_pong(self):
-        pong = json.dumps({'msgtype': 'pong'}).encode('utf-8')
+    def send_pong(self,cert):
+        pong = json.dumps({'msgtype': 'pong',"cert":cert}).encode('utf-8')
         self.transport.write(pong + b"\n")
 
     def send_get_list_request(self,data):
@@ -218,7 +218,8 @@ class ClientProtocol(Protocol):
         self.transport.write(str + b"\n")
 
     def handle_ping(self):
-        self.send_pong()
+        cert_json = r.get("http://"+cfg.host+":"+str(cfg.port)+"/cert")
+        self.send_pong(cert_json.text)
 
     def handle_pong(self):
         print("Got pong from", self.remote_nodeid)
@@ -279,3 +280,6 @@ def node_run():
     c = ClientCreator(reactor, ClientProtocol)
     c.connectTCP(BOOTSTRAP_IP, BOOTSTRAP_PORT).addCallback(gotProtocol)
     reactor.run()
+
+if __name__ == '__main__':
+    node_run()

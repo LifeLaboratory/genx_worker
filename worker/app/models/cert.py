@@ -5,7 +5,7 @@ import time
 class Cert(BaseModel):
     def __init__(self, cert):
         cert_parse = cert.split(';')
-        self.expired_time = str(int(cert_parse[0]) + 10000)
+        self.expired_time = str(int(cert_parse[0]))
         self.common_name = cert_parse[1]
         self.hash = cert_parse[2]
 
