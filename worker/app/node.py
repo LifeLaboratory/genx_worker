@@ -125,7 +125,7 @@ class ServerProtocol(Protocol):
 
     def send_task_response(self,data):
         print("Send task response status", status)
-        r.post('http://' + data["node_ip"]+"/task/result", data=json.dumps({"task_id":data["task_id"], "status": status}))
+        r.post('http://' + data["node_ip"]+":"+str(cfg.port)+"/task/result", json={"task_id":data["task_id"], "data": status})
 
     def handle_get_list_request(self):
         print("Got get_list request", self.remote_nodeid)
@@ -233,7 +233,7 @@ class ClientProtocol(Protocol):
             if list(peer.keys())[0] == HOST_IP:
                 continue
             c = ClientCreator(reactor, ClientProtocol)
-            c.connectTCP(list(peer.values())[0], 6000).addCallback(gotPeerTask,data=data)
+            c.connectTCP(list(peer.keys())[0], 6000).addCallback(gotPeerTask,data=data)
 
     def handle_hello(self, hello):
         hello = json.loads(hello)
